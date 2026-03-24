@@ -25,7 +25,7 @@ class Tender extends Model
 
     public function getIsFavoriteAttribute() 
     {
-        // auth('sanctum')->user() orqali foydalanuvchini tekshiramiz
+       
         $user = auth('sanctum')->user();
         if($user){
             return $this->favoritedBy()->where('user_id', $user->id)->exists();
@@ -33,7 +33,7 @@ class Tender extends Model
         return false;
     }
 
-    public function favoritedBy() // Nomini to'g'riladim
+    public function favoritedBy()
     {
         return $this->belongsToMany(User::class, 'favorite_tenders', 'tender_id', 'user_id');
     }

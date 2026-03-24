@@ -5,7 +5,7 @@ use App\Http\Controllers\TenderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/tenders', [TenderController::class, 'index']); 
 
