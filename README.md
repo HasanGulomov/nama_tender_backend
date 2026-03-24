@@ -1,59 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Tushunarli, demak do'stingiz loyihani o'rnatayotganda qiynalmasligi uchun `README.md` fayliga aniq ko'rsatmalar yozib qo'yishimiz kerak. Bu professional yondashuv hisoblanadi.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Mana shu matnni nusxalab, `README.md` faylingizga joylashtiring (eski matnni o'chirib tashlasangiz ham bo'ladi):
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```markdown
+# Nama Tender Backend (Laravel)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Ushbu loyihani mahalliy kompyuterda ishga tushirish uchun quyidagi qadamlarni bajaring:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Loyihani yuklab olish
+```bash
+git clone [https://github.com/HasanGulomov/nama_tender_backend.git](https://github.com/HasanGulomov/nama_tender_backend.git)
+cd nama_tender_backend
+```
 
-## Learning Laravel
+### 2. Kutubxonalarni o'rnatish
+```bash
+composer install
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 3. Muhit faylini sozlash (.env)
+`.env.example` faylidan nusxa olib, yangi `.env` faylini yarating:
+```bash
+cp .env.example .env
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 4. Application Key generatsiya qilish
+```bash
+php artisan key:generate
+```
 
-## Laravel Sponsors
+### 5. Ma'lumotlar bazasini sozlash (MySQL)
+Avval MySQL-da yangi baza oching (masalan: `napa_tender`). So'ng `.env` faylini ochib, quyidagi qatorlarni o'zingizning bazangizga moslang:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=napa_tender
+DB_USERNAME=root
+DB_PASSWORD=sizning_parolingiz
+```
 
-### Premium Partners
+### 6. Migratsiyalarni amalga oshirish
+Bazaga jadvallarni yuklash uchun:
+```bash
+php artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 7. Loyihani ishga tushirish
+```bash
+php artisan serve
+```
+```
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Buni qanday saqlash kerak?
 
-## Code of Conduct
+1.  VS Code-da **README.md** faylini oching.
+2.  Yuqoridagi kodni ichiga tashlang va saqlang (`Ctrl + S`).
+3.  Terminalda quyidagi buyruqlarni yozib, GitHub-ga yuboring:
+    ```bash
+    git add README.md
+    git commit -m "README fayli yangilandi: o'rnatish yo'riqnomasi qo'shildi"
+    git push origin main
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Endi do'stingiz GitHub sahifangizga kirsa, pastda tayyor qo'llanmani ko'radi va shunga qarab loyihani osonlikcha ishga tushiradi.
 
-## Security Vulnerabilities
+**Yana bir narsa:** Agar loyihangizda rasm yoki fayllar yuklangan bo'lsa, do'stingizga `php artisan storage:link` buyrug'ini ham yozishni maslahat berishimiz kerakmi?
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Usmon gey 
