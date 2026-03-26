@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('tender', function (Blueprint $table) {
             $table->id();
             $table->string('category');
-            $table->integer('status_percentage');
             $table->string('title');
             $table->text('description');
             $table->string('budget');

@@ -16,7 +16,6 @@ class TenderController extends Controller
     {
         $data = $request->validate([
             'category' => 'required|string',
-            'status_percentage' => 'required|integer',
             'title' => 'required|string',
             'description' => 'required|string',
             'budget' => 'required|string',

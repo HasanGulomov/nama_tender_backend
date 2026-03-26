@@ -5,19 +5,22 @@ use App\Http\Controllers\TenderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/tenders', [TenderController::class, 'index']); 
+Route::get('/tenders', [TenderController::class, 'index'])->name('tender.allTenders');
 
 Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    Route::post('/tenders', [TenderController::class, 'store'])->name('tender.create');
     
     Route::post('/tender/{id}/favorite', [TenderController::class, 'toggleFavorite']);
     
     Route::get('/favorites', [TenderController::class, 'getFavorite']);
-    
-    Route::apiResource('tenders', TenderController::class)->except(['index', 'show']);
+
+    Route::apiResource('tenders', TenderController::class)->except(['index', 'show', 'store']);
 });

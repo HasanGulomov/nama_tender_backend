@@ -13,7 +13,6 @@ class Tender extends Model
 
     protected $fillable = [
         'category',
-        'status_percentage',
         'title',
         'description',
         'budget',
