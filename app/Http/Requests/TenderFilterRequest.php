@@ -8,17 +8,18 @@ class TenderFilterRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Shartli ravishda true qilamiz
+        return true; 
     }
 
     public function rules(): array
     {
         return [
-            'category'   => 'nullable|string',
-            'location'   => 'nullable|string',
-            'deadline'   => 'nullable|date',
-            'min_budget' => 'nullable|numeric',
-            'max_budget' => 'nullable|numeric',
-        ];
+        'category'     => 'nullable|string',
+        'budgetRange'  => 'nullable|string', 
+        'closingDate'  => 'nullable|string', 
+        'region'       => 'nullable|string',
+        'source'       => 'nullable|string',
+        'sortOrder'    => 'nullable|string|in:highest,lowest',
+    ];
     }
 }

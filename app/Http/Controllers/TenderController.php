@@ -28,21 +28,32 @@ class TenderController extends Controller
         return response()->json($tenders);
     }
 
-
-public function filter(TenderFilterRequest $request) // Request o'rniga biz ochgan klass
+public function filter(TenderFilterRequest $request) 
 {
-    // Validatsiya qilingan ma'lumotlarni olamiz
-    $params = $request->validated();
-
-    $query = Tender::query();
-
-    $query->when($request->category, fn($q) => $q->where('category', $request->category))
-        ->when($request->location, fn($q) => $q->where('location', 'like', '%' . $request->location . '%'))
-        ->when($request->deadline, fn($q) => $q->whereDate('deadline', '>=', $request->deadline))
-        ->when($request->min_budget, fn($q) => $q->where('budget', '>=', $request->min_budget))
-        ->when($request->max_budget, fn($q) => $q->where('budget', '<=', $request->max_budget));
-
-    return response()->json($query->latest()->paginate(10)->appends($request->query()));
+    return response()->json(
+        Tender::query()
+            ->when($request->category, fn($q, $v) => $q->where('category', $v))
+            ->when($request->region, fn($q, $v) => $q->where('location', 'like', "%$v%"))
+            ->when($request->source, fn($q, $v) => $q->where('source', $v))
+            ->when($request->budgetRange, fn($q, $v) => match ($v) {
+                'under-100k' => $q->where('budget', '<', 100000),
+                '100k-500k'  => $q->whereBetween('budget', [100000, 500000]),
+                'over-500k'  => $q->where('budget', '>', 500000),
+                default      => $q
+            })
+            ->when($request->closingDate, fn($q, $v) => match ($v) {
+                'today'      => $q->whereDate('deadline', now()),
+                'this-week'  => $q->whereBetween('deadline', [now()->startOfWeek(), now()->endOfWeek()]),
+                'this-month' => $q->whereMonth('deadline', now()->month),
+                default      => $q
+            })
+            ->when($request->sortOrder, 
+                fn($q, $v) => $q->orderBy('budget', $v === 'highest' ? 'desc' : 'asc'),
+                fn($q) => $q->latest()
+            )
+            ->paginate(10)
+            ->appends($request->query())
+    );
 }
 
 
