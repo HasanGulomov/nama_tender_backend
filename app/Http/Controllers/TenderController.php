@@ -36,53 +36,47 @@ class TenderController extends Controller
     }
 
     
-    public function filter(TenderFilterRequest $request) 
-    {
-        $query = Tender::query(); 
+  public function filter(TenderFilterRequest $request) 
+{
+    $query = Tender::query(); 
 
-        $perPage = $request->query('per_page', 10);
-         
-      
-        $query->when($request->category, function($q, $v){
-            $categories = is_array($v) ? $v : explode(',', $v); 
-            $q->whereIn('category', $categories);
-        });
-          
     
-        $query->when($request->region, function ($q, $v){
-            $regions = is_array($v) ? $v : explode(',', $v);
-            $q->where(function ($subQuery) use ($regions){
-                foreach ($regions as $region) {
-                    $subQuery->orWhere('location', 'like', "%" . trim($region) . "%");
-                }
-            });
+    $query->when($request->category, function($q, $v) {
+        $categories = is_array($v) ? $v : array_map('trim', explode(',', $v));
+        $q->whereIn('category', $categories);
+    });
+
+    $query->when($request->region, function ($q, $v) {
+        $regions = is_array($v) ? $v : array_map('trim', explode(',', $v));
+        $q->where(function ($subQuery) use ($regions) {
+            foreach ($regions as $region) {
+                $subQuery->orWhere('location', 'like', "%$region%");
+            }
         });
+    });
 
-        $query->when($request->source, function($q, $v){
-            $sources = is_array($v) ? $v : explode(',', $v);
-            $q->whereIn('source', $sources);
-        });
+    
+    $query->when($request->source, function($q, $v) {
+        $sources = is_array($v) ? $v : array_map('trim', explode(',', $v));
+        $q->whereIn('source', $sources);
+    });
 
-        
-        $query->when($request->min_budget, fn($q, $v) => $q->where('budget', '>=', $v));
-        $query->when($request->max_budget, fn($q, $v) => $q->where('budget', '<=', $v));
+   $query->when($request->min_budget, function($q, $v) {
+    $q->whereRaw('CAST(budget AS UNSIGNED) >= ?', [(int)$v]);
+});
 
-        
-        $query->when($request->deadline, fn($q, $v) => $q->whereDate('deadline', $v));
 
-        
-        if ($request->sortOrder) {
-            $direction = ($request->sortOrder === 'highest') ? 'desc' : 'asc';
-            $query->orderBy('budget', $direction);
-        } else {
-            $query->latest();
-        }
+$query->when($request->max_budget, function($q, $v) {
+    $q->whereRaw('CAST(budget AS UNSIGNED) <= ?', [(int)$v]);
+});
 
-        return response()->json(
-            $query->paginate($perPage)->appends($request->query())
-        );
-    }
 
+    $query->when($request->closingDate, fn($q, $v) => $q->whereDate('deadline', $v));
+
+    $query->latest();
+
+    return response()->json($query->get());
+}
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [

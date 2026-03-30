@@ -12,14 +12,14 @@ class TenderFilterRequest extends FormRequest
     }
 
     public function rules(): array
-    {
-        return [
+{
+    return [
         'category'     => 'nullable|string',
-        'budgetRange'  => 'nullable|string', 
-        'closingDate'  => 'nullable|string', 
+        'min_budget'   => 'nullable|numeric', // Alohida kelsa
+        'max_budget'   => 'nullable|numeric', // Alohida kelsa
+        'closingDate'  => 'nullable|date', 
         'region'       => 'nullable|string',
         'source'       => 'nullable|string',
-        'per_page'     => 'nullable|integer|min:1|max:100',
     ];
-    }
+}
 }
