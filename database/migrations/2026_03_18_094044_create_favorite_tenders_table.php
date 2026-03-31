@@ -16,7 +16,7 @@ public function up(): void
         
       
         $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-        $table->foreignId('tender_id')->constrained('tender')->onDelete('cascade');
+        $table->foreignId('tender_id')->constrained('tenders')->onDelete('cascade');
         
         $table->timestamps();
     });

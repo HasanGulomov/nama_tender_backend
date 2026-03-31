@@ -36,43 +36,25 @@ class TenderController extends Controller
     }
 
     
-  public function filter(TenderFilterRequest $request) 
+    
+ public function filter(TenderFilterRequest $request) 
 {
     $query = Tender::query(); 
 
-    $query->when($request->category, function($q, $v) {
-        $categories = is_array($v) ? $v : array_map('trim', explode(',', $v));
-        $q->whereIn('category', $categories);
-    });
+ 
+    $query->when($request->category_id, fn($q, $v) => $q->where('category_id', $v));
+    $query->when($request->region_id, fn($q, $v) => $q->where('region_id', $v));
+    $query->when($request->source_id, fn($q, $v) => $q->where('source_id', $v));
 
   
-    $query->when($request->region, function ($q, $v) {
-        $regions = is_array($v) ? $v : array_map('trim', explode(',', $v));
-        $q->where(function ($subQuery) use ($regions) {
-            foreach ($regions as $region) {
-                $subQuery->orWhere('location', 'like', "%$region%");
-            }
-        });
-    });
-
-    $query->when($request->source, function($q, $v) {
-        $sources = is_array($v) ? $v : array_map('trim', explode(',', $v));
-        $q->whereIn('source', $sources);
-    });
-
-    $query->when($request->min_budget, function($q, $v) {
-        $q->whereRaw('CAST(budget AS UNSIGNED) >= ?', [(int)$v]);
-    });
-
-    $query->when($request->max_budget, function($q, $v) {
-        $q->whereRaw('CAST(budget AS UNSIGNED) <= ?', [(int)$v]);
-    });
-
+    $query->when($request->min_budget, fn($q, $v) => $q->where('budget', '>=', $v));
+    $query->when($request->max_budget, fn($q, $v) => $q->where('budget', '<=', $v));
     $query->when($request->closingDate, fn($q, $v) => $q->whereDate('deadline', $v));
 
-    $query->latest();
+   
+    $tenders = $query->with(['category', 'region', 'source'])->latest()->get();
 
-    return response()->json($query->get());
+    return response()->json($tenders);
 }
 
     public function store(Request $request)
@@ -81,7 +63,7 @@ class TenderController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
-            'location' => 'required|string',
+            'region' => 'required|string',
             'deadline' => 'required|date',
             'budget' => 'required|numeric',
             'source' => 'required|string'
@@ -111,7 +93,7 @@ class TenderController extends Controller
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'category' => 'sometimes|string',
-            'location' => 'sometimes|string',
+            'region' => 'sometimes|string',
             'deadline' => 'sometimes|date',
             'budget' => 'sometimes|numeric',
         ]);

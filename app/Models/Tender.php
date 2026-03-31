@@ -9,17 +9,21 @@ class Tender extends Model
 {
     use HasFactory;
 
-    protected $table = 'tender'; 
+    protected $table = 'tenders'; 
 
     protected $fillable = [
-        'source',
-        'category',
+        'source_id',
+        'category_id',
         'title',
         'description',
         'budget',
-        'location',
+        'region_id',
         'deadline'
     ];
+
+    public function category() { return $this->belongsTo(Category::class); }
+public function region() { return $this->belongsTo(Region::class); }
+public function source() { return $this->belongsTo(Source::class); }
 
     protected $appends = ['is_favorite'];
 

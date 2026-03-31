@@ -11,15 +11,26 @@ class TenderFilterRequest extends FormRequest
         return true; 
     }
 
+    /**
+     * @queryParam region_id integer Viloyatni tanlang. Example: 1
+     * @enumValues region_id {"1": "Tashkent", "2": "Andijan", "3": "Bukhara", "4": "Fergana", "5": "Jizzakh", "6": "Namangan", "7": "Navoi", "8": "Kashkadarya", "9": "Samarkand", "10": "Sirdaryo", "11": "Surkhandarya", "12": "Khorezm"}
+     * * @queryParam category_id integer Kategoriyani tanlang. Example: 1
+     * @enumValues category_id {"1": "Technology", "2": "Infrastructure", "3": "Supplies", "4": "Sustainability"}
+     * * @queryParam source_id integer Manbani tanlang. Example: 1
+     * @enumValues source_id {"1": "IT MARKET", "2": "UZEX", "3": "TENDER WEEK", "4": "XT-XARID"}
+     * * @queryParam min_budget numeric Minimal budjet. Example: 1000000
+     * @queryParam max_budget numeric Maksimal budjet. Example: 500000000
+     * @queryParam closingDate date Tugash muddati (YYYY-MM-DD). Example: 2025-03-15
+     */
     public function rules(): array
-{
-    return [
-        'category'     => 'nullable|string',
-        'min_budget'   => 'nullable|numeric', // Alohida kelsa
-        'max_budget'   => 'nullable|numeric', // Alohida kelsa
-        'closingDate'  => 'nullable|date', 
-        'region'       => 'nullable|string',
-        'source'       => 'nullable|string',
-    ];
-}
+    {
+        return [
+            'region_id'   => 'nullable|integer|in:1,2,3,4,5,6,7,8,9,10,11,12',
+            'category_id' => 'nullable|integer|in:1,2,3,4',
+            'source_id'   => 'nullable|integer|in:1,2,3,4',
+            'min_budget'  => 'nullable|numeric', 
+            'max_budget'  => 'nullable|numeric',
+            'closingDate' => 'nullable|date', 
+        ];
+    }
 }

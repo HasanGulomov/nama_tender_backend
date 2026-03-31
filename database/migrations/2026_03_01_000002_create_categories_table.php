@@ -11,15 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tender', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('source'); 
-            $table->string('category');
-            $table->string('title');
-            $table->text('description');
-            $table->string('budget');
-            $table->string('location');
-            $table->date('deadline');
+            $table->string('name'); 
             $table->timestamps();
         });
     }
@@ -29,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tender');
+        Schema::dropIfExists('categories');
     }
 };
