@@ -24,6 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::put('/user/update', [AuthController::class, 'update']);
+    Route::delete('/user/delete', [AuthController::class, 'delete']);
+
     Route::get('/regions', fn() => response()->json(Region::all()));
 Route::get('/sources', fn() => response()->json(Source::all()));
 Route::get('/categories', fn() => response()->json(Category::all()));

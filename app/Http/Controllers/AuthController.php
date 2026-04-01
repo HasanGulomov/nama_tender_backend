@@ -52,4 +52,44 @@ class AuthController extends Controller
             'user'    => $user
         ]);
     }
+    
+    
+public function update(Request $request)
+{
+    $user = $request->user(); 
+
+    $request->validate([
+        'username' => 'string|max:255',
+        'email'    => 'string|email|unique:users,email,' . $user->id,
+        'password' => 'nullable|string|min:6|confirmed', 
+    ]);
+
+    $user->username = $request->username ?? $user->username;
+    $user->email = $request->email ?? $user->email;
+
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return response()->json([
+        'message' => 'Ma’lumotlar muvaffaqiyatli yangilandi',
+        'user'    => $user
+    ]);
+}
+
+
+public function delete(Request $request)
+{
+    $user = $request->user();
+    
+    
+    $user->tokens()->delete();
+    $user->delete();
+
+    return response()->json([
+        'message' => 'Akkaunt o‘chirildi'
+    ], 200);
+}
 }
