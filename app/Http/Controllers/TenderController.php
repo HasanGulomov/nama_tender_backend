@@ -13,15 +13,19 @@ class TenderController extends Controller
     
     
   public function index(Request $request)
-    {
-        $perPage = $request->query('per_page', 10);
-        
-        // Modelda $with borligi uchun nomlar avtomatik chiqadi
-        $tenders = Tender::latest()->paginate($perPage);
-        
-        return response()->json($tenders);
-    }
-
+{
+    // 1. per_page qiymatini olish (default 10)
+    $perPage = $request->query('per_page', 10);
+    
+    // 2. Eager Loading orqali bog'langan jadvallarni (Category, Region, Source) yuklash
+    // Bu qator har bir tender uchun tegishli nomlarni qo'shib beradi
+    $tenders = Tender::with(['category', 'region', 'source'])
+        ->latest()
+        ->paginate($perPage);
+    
+    // 3. Javobni qaytarish
+    return response()->json($tenders);
+}
     /**
      * Tenderlarni ID bo'yicha filter qilish
      */
