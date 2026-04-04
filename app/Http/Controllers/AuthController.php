@@ -6,13 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class AuthController extends Controller 
+class AuthController extends Controller
 {
-    
+
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string', 
+            'username' => 'required|string',
             'email'    => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:6',
         ]);
@@ -20,7 +20,7 @@ class AuthController extends Controller
         $user = User::create([
             'username' => $request->username,
             'email'    => $request->email,
-            'password' => Hash::make($request->password), 
+            'password' => Hash::make($request->password),
         ]);
 
         return response()->json([
@@ -30,7 +30,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    
+
     public function login(Request $request)
     {
         $request->validate([
@@ -38,10 +38,10 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        
+
         $user = User::where('email', $request->email)->first();
 
-      
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Email, yoki parol xato!'], 401);
         }
@@ -52,44 +52,44 @@ class AuthController extends Controller
             'user'    => $user
         ]);
     }
-    
-    
-public function update(Request $request)
-{
-    $user = $request->user(); 
 
-    $request->validate([
-        'username' => 'string|max:255',
-        'email'    => 'string|email|unique:users,email,' . $user->id,
-        'password' => 'nullable|string|min:6|confirmed', 
-    ]);
 
-    $user->username = $request->username ?? $user->username;
-    $user->email = $request->email ?? $user->email;
+    public function update(Request $request)
+    {
+        $user = $request->user();
 
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
+        $request->validate([
+            'username' => 'string|max:255',
+            'email'    => 'string|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        $user->username = $request->username ?? $user->username;
+        $user->email = $request->email ?? $user->email;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Ma’lumotlar muvaffaqiyatli yangilandi',
+            'user'    => $user
+        ]);
     }
 
-    $user->save();
 
-    return response()->json([
-        'message' => 'Ma’lumotlar muvaffaqiyatli yangilandi',
-        'user'    => $user
-    ]);
-}
+    public function delete(Request $request)
+    {
+        $user = $request->user();
 
 
-public function delete(Request $request)
-{
-    $user = $request->user();
-    
-    
-    $user->tokens()->delete();
-    $user->delete();
+        $user->tokens()->delete();
+        $user->delete();
 
-    return response()->json([
-        'message' => 'Akkaunt o‘chirildi'
-    ], 200);
-}
+        return response()->json([
+            'message' => 'Akkaunt o‘chirildi'
+        ], 200);
+    }
 }

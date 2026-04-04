@@ -9,50 +9,31 @@ use App\Http\Requests\TenderFilterRequest;
 
 class TenderController extends Controller
 {
-    
-    
-    
-  public function index(Request $request)
-{
 
-    $perPage = $request->query('per_page', 10);
-    
 
-    $tenders = Tender::with(['category', 'region', 'source'])
-        ->latest()
-        ->paginate($perPage);
 
-    return response()->json($tenders);
-}
-    
- public function getFilterData()
+    public function index(Request $request)
     {
-        $budgets = [
-            'min_budget' => (float) Tender::min('budget') ?? 0,
-            'max_budget' => (float) Tender::max('budget') ?? 0,
-        ];
+
+        $perPage = $request->query('per_page', 10);
 
 
-        $deadlines = Tender::whereNotNull('deadline')
-            ->distinct()
-            ->orderBy('deadline', 'asc')
-            ->pluck('deadline');
+        $tenders = Tender::with(['category', 'region', 'source'])
+            ->latest()
+            ->paginate($perPage);
 
-        return response()->json([
-            'budgets'   => $budgets,
-            'deadlines' => $deadlines,
-        ]);
+        return response()->json($tenders);
     }
-
 
     public function filter(TenderFilterRequest $request)
     {
         $query = Tender::with(['category', 'region', 'source']);
 
+
         $query->when($request->category_id, fn($q, $v) => $q->whereIn('category_id', (array)$v));
         $query->when($request->region_id, fn($q, $v) => $q->whereIn('region_id', (array)$v));
         $query->when($request->source_id, fn($q, $v) => $q->whereIn('source_id', (array)$v));
-        
+
         $query->when($request->filled('min_budget'), function ($q) use ($request) {
             return $q->where('budget', '>=', (float)$request->min_budget);
         });
@@ -62,58 +43,57 @@ class TenderController extends Controller
             return $q->where('budget', '<=', (float)$request->max_budget);
         });
 
-
-        $query->when($request->filled('closingDate'), function ($q) use ($request) {
-            return $q->whereDate('deadline', '=', $request->closingDate);
-        });
+        // $query->when($request->filled('closingDate'), function ($q) use ($request) {
+        //     return $q->whereDate('deadline', '<=', $request->closingDate);
 
         $tenders = $query->latest()->get();
 
         return response()->json($tenders);
     }
-    public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'category_id' => 'required|integer|exists:categories,id', 
-        'region_id' => 'required|integer|exists:regions,id',
-        'source_id' => 'required|integer|exists:sources,id',
-        'deadline' => 'required|date',
-        'budget' => 'required|numeric',
-    ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|integer|exists:categories,id',
+            'region_id' => 'required|integer|exists:regions,id',
+            'source_id' => 'required|integer|exists:sources,id',
+            'deadline' => 'required|date',
+            'budget' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $tender = Tender::create($request->all());
+
+
+        $tender->load(['category', 'region', 'source']);
+
+        return response()->json([
+            'message' => 'Tender muvaffaqiyatli yaratildi',
+            'data' => $tender
+        ], 201);
     }
 
-    $tender = Tender::create($request->all());
 
-
-    $tender->load(['category', 'region', 'source']);
-
-    return response()->json([
-        'message' => 'Tender muvaffaqiyatli yaratildi', 
-        'data' => $tender 
-    ], 201);
-}
-
-   
     public function show($id)
     {
         $tender = Tender::find($id);
-        
+
         if (!$tender) {
             return response()->json(['message' => 'Tender topilmadi'], 404);
         }
-        
+
         return response()->json($tender);
     }
 
     public function update(Request $request, $id)
     {
         $tender = Tender::find($id);
-        
+
         if (!$tender) {
             return response()->json(['message' => 'Tender topilmadi'], 404);
         }
@@ -133,7 +113,7 @@ class TenderController extends Controller
         }
 
         $tender->update($request->all());
-        
+
         return response()->json([
             'message' => 'Tender yangilandi',
             'data'    => $tender->fresh()
@@ -144,13 +124,13 @@ class TenderController extends Controller
     public function destroy($id)
     {
         $tender = Tender::find($id);
-        
+
         if (!$tender) {
             return response()->json(['message' => 'Tender topilmadi'], 404);
         }
-        
+
         $tender->delete();
-        
+
         return response()->json(['message' => 'Tender muvaffaqiyatli o‘chirildi']);
     }
 
@@ -158,15 +138,33 @@ class TenderController extends Controller
     public function search(Request $request)
     {
         $request->validate(['search' => 'required|string']);
-        
+
         $perPage = $request->query('per_page', 10);
-        
+
         $tenders = Tender::where('title', 'like', '%' . $request->search . '%')
             ->latest()
             ->paginate($perPage)
             ->appends($request->query());
 
         return response()->json($tenders);
+    }
+
+    public function toggleFavorite(Request $request, $id)
+    {
+        $user = $request->user();
+        $tender = Tender::find($id);
+
+        if (!$tender) {
+            return response()->json(['message' => 'Tender topilmadi'], 404);
+        }
+        $status = $user->favorites()->toggle($id);
+
+        $attached = count($status['attached']) > 0;
+
+        return response()->json([
+            'message' => $attached ? 'Tender sevimlilarga qo‘shildi' : 'Tender sevimlilardan olib tashlandi',
+            'is_favorite' => $attached
+        ]);
     }
 
     public function getFavorite(Request $request)
