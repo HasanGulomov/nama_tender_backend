@@ -26,23 +26,18 @@ class TenderController extends Controller
     {
         $query = Tender::with(['category', 'region', 'source']);
 
-        $query->when(
-            !empty($request->category_id),
-            fn($q) =>
-            $q->whereIn('category_id', (array)$request->category_id)
-        );
+        if ($request->filled('category_id')) {
+            $query->whereIn('category_id', (array)$request->category_id);
+        }
 
-        $query->when(
-            !empty($request->region_id),
-            fn($q) =>
-            $q->whereIn('region_id', (array)$request->region_id)
-        );
+        // Regionlar
+        if ($request->filled('region_id')) {
+            $query->whereIn('region_id', (array)$request->region_id);
+        }
 
-        $query->when(
-            !empty($request->source_id),
-            fn($q) =>
-            $q->whereIn('source_id', (array)$request->source_id)
-        );
+        if ($request->filled('source_id')) {
+            $query->whereIn('source_id', (array)$request->source_id);
+        }
 
         $query->when(
             $request->has('min_budget'),
