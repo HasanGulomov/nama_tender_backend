@@ -25,7 +25,7 @@ class TenderFilterRequest extends FormRequest
             'source_id.*' => 'integer|in:1,2,3,4',
 
             'min_budget'    => 'nullable|numeric|min:0',
-            'max_budget'    => 'nullable|numeric|gt:min_budget',
+            'max_budget'    => 'nullable|numeric|min:0',
             'closingDate'   => 'nullable|date_format:Y-m-d',
         ];
     }

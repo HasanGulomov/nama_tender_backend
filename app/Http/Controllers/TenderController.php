@@ -22,39 +22,64 @@ class TenderController extends Controller
         return TenderResource::collection($tenders);
     }
 
+
+
+
     public function filter(TenderFilterRequest $request)
+
     {
+
         $query = Tender::with(['category', 'region', 'source']);
 
-        // IDlar bo'yicha filtr
-        if ($request->filled('category_id')) {
-            $query->whereIn('category_id', (array)$request->category_id);
-        }
-        if ($request->filled('region_id')) {
-            $query->whereIn('region_id', (array)$request->region_id);
-        }
-        if ($request->filled('source_id')) {
-            $query->whereIn('source_id', (array)$request->source_id);
-        }
 
-        // Byudjet bo'yicha (filled ishlatamiz)
-        $query->when($request->filled('min_budget'), function ($q) use ($request) {
-            $q->where('budget', '>=', (float)$request->min_budget);
-        });
 
-        $query->when($request->filled('max_budget'), function ($q) use ($request) {
-            $q->where('budget', '<=', (float)$request->max_budget);
-        });
+        $query->when(
+            !empty($request->category_id),
+            fn($q) =>
+            $q->whereIn('category_id', (array)$request->category_id)
+        );
 
-        // Deadline bo'yicha
-        if ($request->filled('closingDate')) {
-            $query->whereDate('deadline', '<=', $request->closingDate);
-        }
+        $query->when(
+            !empty($request->region_id),
+            fn($q) =>
+            $q->whereIn('region_id', (array)$request->region_id)
+        );
 
-        $results = $query->latest()->get();
+        $query->when(
+            !empty($request->source_id),
+            fn($q) =>
+            $q->whereIn('source_id', (array)$request->source_id)
 
-        return TenderResource::collection($results);
+        );
+
+        $query->when(
+            $request->filled('min_budget'),
+            fn($q) =>
+            $q->where('budget', '>=', (float)$request->min_budget)
+
+        );
+
+        $query->when(
+            $request->filled('max_budget'),
+            fn($q) =>
+            $q->where('budget', '<=', (float)$request->max_budget)
+        );
+
+
+
+        $query->when(
+            $request->filled('closingDate'),
+            fn($q) =>
+            $q->whereDate('deadline', '>=', \Carbon\Carbon::parse($request->closingDate))
+
+        );
+
+
+
+        return TenderResource::collection($query->latest()->get());
     }
+
+
 
     public function getFilterData()
     {
