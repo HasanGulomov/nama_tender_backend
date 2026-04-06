@@ -64,11 +64,16 @@ class TenderController extends Controller
     public function getFilterData()
     {
         return response()->json([
+            'categories' => \App\Models\Category::all(),
+            'regions'    => \App\Models\Region::all(),
+            'sources'    => \App\Models\Source::all(), // Endi Source ham bor
             'budgets' => [
-                'min_budget' => (float) Tender::min('budget') ?? 0,
-                'max_budget' => (float) Tender::max('budget') ?? 0,
+                'min_budget' => (float) Tender::min('budget') ?: 0,
+                'max_budget' => (float) Tender::max('budget') ?: 0,
             ],
-            'deadlines' => Tender::whereNotNull('deadline')->distinct()->pluck('deadline')
+            'deadlines' => Tender::whereNotNull('deadline')
+                ->distinct()
+                ->pluck('deadline')
         ]);
     }
 
