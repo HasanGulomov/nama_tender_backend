@@ -2,34 +2,29 @@
 
 namespace App\Repositories;
 
-use App\Models\Tender;
-use App\Models\Category;
-use App\Models\Region;
-use App\Models\Source;
+use App\Models\{Tender, Category, Region, Source};
 
 class TenderRepository
 {
-    public function getPaginated($perPage = 10)
-    {
-        return Tender::with(['category', 'region', 'source'])
-            ->latest()
-            ->paginate($perPage);
-    }
-
-    public function filterTenders($data)
+    public function getFiltered($params, $perPage = 10)
     {
         $query = Tender::with(['category', 'region', 'source']);
+        $query->when(!empty($params['search']), function ($q) use ($params) {
+            $search = $params['search'];
+            $q->where(function ($sub) use ($search) {
+                $sub->where('title', 'like', '%' . $search . '%');
+            });
+        });
 
-        $query->when(!empty($data['category_id'] ?? null), fn($q) => $q->whereIn('category_id', (array)$data['category_id']));
-        $query->when(!empty($data['region_id'] ?? null), fn($q) => $q->whereIn('region_id', (array)$data['region_id']));
-        $query->when(isset($data['min_budget']), fn($q) => $q->where('budget', '>=', (float)$data['min_budget']));
-        $query->when(isset($data['max_budget']), fn($q) => $q->where('budget', '<=', (float)$data['max_budget']));
-        $query->when(
-            ($data['closingDate'] ?? null),
-            fn($q) => $q->where('deadline', $data['closingDate'])
-        );
+        $query->when(!empty($params['category_id']), fn($q) => $q->whereIn('category_id', (array)$params['category_id']));
+        $query->when(!empty($params['region_id']), fn($q) => $q->whereIn('region_id', (array)$params['region_id']));
 
-        return $query->latest()->get();
+        $query->when(isset($params['min_budget']), fn($q) => $q->where('budget', '>=', (float)$params['min_budget']));
+        $query->when(isset($params['max_budget']), fn($q) => $q->where('budget', '<=', (float)$params['max_budget']));
+
+        $query->when(!empty($params['closingDate']), fn($q) => $q->whereDate('deadline', $params['closingDate']));
+
+        return $query->latest()->paginate($perPage);
     }
 
     public function getMetaData()
@@ -53,15 +48,6 @@ class TenderRepository
 
     public function create($data)
     {
-        $tender = Tender::create($data);
-        return $tender->load(['category', 'region', 'source']);
-    }
-
-    public function search($term, $perPage = 10)
-    {
-        return Tender::with(['category', 'region', 'source'])
-            ->where('title', 'like', '%' . $term . '%')
-            ->latest()
-            ->paginate($perPage);
+        return Tender::create($data)->load(['category', 'region', 'source']);
     }
 }

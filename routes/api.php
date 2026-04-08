@@ -14,8 +14,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 
 Route::get('/tenders', [TenderController::class, 'index'])->name('tenders.index');
-Route::get('/tenders/search', [TenderController::class, 'search'])->name('tenders.search');
-Route::get('/tenders/filter', [TenderController::class, 'filter'])->name('tenders.filter');
+
 Route::get('/tenders/{id}', [TenderController::class, 'show'])->name('tenders.show');
 
 

@@ -13,30 +13,24 @@ class TenderService
         $this->repo = $repo;
     }
 
-    // Bu yerda repository-dagi metodlarni chaqiramiz
-    public function list($perPage)
+    public function list($params, $perPage)
     {
-        return $this->repo->getPaginated($perPage);
+        return $this->repo->getFiltered($params, $perPage);
     }
-    public function filter($data)
-    {
-        return $this->repo->filterTenders($data);
-    }
+
     public function meta()
     {
         return $this->repo->getMetaData();
     }
+
     public function get($id)
     {
         return $this->repo->findById($id);
     }
+
     public function store($data)
     {
         return $this->repo->create($data);
-    }
-    public function search($term, $perPage)
-    {
-        return $this->repo->search($term, $perPage);
     }
 
     public function toggleFavorite($user, $id)

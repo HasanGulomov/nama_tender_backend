@@ -15,6 +15,8 @@ class TenderFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
+
+            'search'      => 'nullable|string',
             'region_id'   => 'nullable|array',
             'region_id.*' => 'integer|in:1,2,3,4,5,6,7,8,9,10,11,12',
 

@@ -16,14 +16,15 @@ class TenderController extends Controller
         $this->service = $service;
     }
 
-    public function index(Request $request)
-    {
-        return TenderResource::collection($this->service->list($request->query('per_page', 10)));
-    }
 
-    public function filter(TenderFilterRequest $request)
+    public function index(TenderFilterRequest $request)
     {
-        return TenderResource::collection($this->service->filter($request->validated()));
+        $tenders = $this->service->list(
+            $request->validated(),
+            $request->query('per_page', 10)
+        );
+
+        return TenderResource::collection($tenders);
     }
 
     public function getFilterData()
@@ -41,12 +42,6 @@ class TenderController extends Controller
     {
         $tender = $this->service->get($id);
         return $tender ? new TenderResource($tender) : response()->json(['message' => 'Topilmadi'], 404);
-    }
-
-    public function search(Request $request)
-    {
-        $request->validate(['search' => 'required|string']);
-        return TenderResource::collection($this->service->search($request->search, $request->query('per_page', 10)));
     }
 
     public function toggleFavorite(Request $request, $id)
