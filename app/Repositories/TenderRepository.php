@@ -17,7 +17,9 @@ class TenderRepository
         });
 
         $query->when(!empty($params['category_id']), fn($q) => $q->whereIn('category_id', (array)$params['category_id']));
-        $query->when(!empty($params['region_id']), fn($q) => $q->whereIn('region_id', (array)$params['region_id']));
+        $query->when(!empty($params['region_id']), function ($q) use ($params) {
+            $q->whereIn('region_id', (array)$params['region_id']);
+        });
 
         $query->when(isset($params['min_budget']), fn($q) => $q->where('budget', '>=', (float)$params['min_budget']));
         $query->when(isset($params['max_budget']), fn($q) => $q->where('budget', '<=', (float)$params['max_budget']));

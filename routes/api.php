@@ -12,11 +12,8 @@ use App\Models\Category;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
 Route::get('/tenders', [TenderController::class, 'index'])->name('tenders.index');
-
 Route::get('/tenders/{id}', [TenderController::class, 'show'])->name('tenders.show');
-
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
